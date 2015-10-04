@@ -17,23 +17,37 @@
 package gcm.play.android.samples.com.gcmquickstart;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public class RegistrationIntentService extends IntentService {
 
     private static final String TAG = "RegIntentService";
     private static final String[] TOPICS = {"global"};
-
+    private GuardarIdService guardarId;
     public RegistrationIntentService() {
         super(TAG);
     }
@@ -85,8 +99,49 @@ public class RegistrationIntentService extends IntentService {
      */
     private void sendRegistrationToServer(String token) {
         // Add custom implementation, as needed.
+        guardarId = new GuardarIdService(getApplicationContext());
+        guardarId.execute(token);
+    }
 
 
+    private class GuardarIdService extends AsyncTask<String, String, Boolean> {
+        private JSONObject responseJSON;
+        private Context context;
+        private String resp;
+        public  GuardarIdService(Context context){
+            this.context = context;
+        }
+        @Override
+        protected Boolean doInBackground(String... params){
+            HttpClient httpClient = new DefaultHttpClient();
+            String uri = "http://52.88.24.228/ServicioTareas/GuardarIdentificacionUsuario.svc/GuardarDeviceId?DeviceId="+params[0];
+            HttpGet post = new HttpGet(uri);
+            post.setHeader("content-type","application/json");
+            JSONObject dato = new JSONObject();
+            try {
+                HttpResponse resp = httpClient.execute(post);
+                String respStr = EntityUtils.toString(resp.getEntity());
+                JSONObject respJSON = new JSONObject(respStr);
+                this.resp = respJSON.toString();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            Toast.makeText(
+                    getApplicationContext(),
+                    "Registro OK",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
