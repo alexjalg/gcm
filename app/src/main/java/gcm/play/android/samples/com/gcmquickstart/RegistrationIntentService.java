@@ -137,10 +137,11 @@ public class RegistrationIntentService extends IntentService {
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
-            Toast.makeText(
+            /*Toast.makeText(
                     getApplicationContext(),
                     "Registro OK",
                     Toast.LENGTH_LONG).show();
+                    */
         }
     }
 

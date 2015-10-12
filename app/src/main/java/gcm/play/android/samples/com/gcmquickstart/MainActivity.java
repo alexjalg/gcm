@@ -26,6 +26,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.webkit.WebView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -38,7 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     private BroadcastReceiver mRegistrationBroadcastReceiver;
-   // private ProgressBar mRegistrationProgressBar;
+    private WebView wv_page;
+
+    // private ProgressBar mRegistrationProgressBar;
    // private TextView mInformationTextView;
 
     @Override
@@ -69,6 +72,13 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
         }
+
+
+        wv_page = (WebView) findViewById(R.id.wv_page);
+        wv_page.getSettings().setJavaScriptEnabled(true);
+        wv_page.loadUrl("http://52.88.24.228/monitorin/login.html");
+
+
     }
 
     @Override
